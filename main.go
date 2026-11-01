@@ -9,10 +9,10 @@ import (
 )
 
 func main() {
-	// Initialize Database and run GORM AutoMigrate
+	// connect db & run migrations
 	config.ConnectDatabase()
 
-	// Initialize Gin router
+	// setup router
 	r := routers.SetupRouter()
 
 	port := os.Getenv("PORT")

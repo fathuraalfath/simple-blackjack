@@ -15,17 +15,17 @@ type User struct {
 }
 
 type Card struct {
-	Suit  string `json:"suit"`  // H (Hearts), D (Diamonds), C (Clubs), S (Spades)
-	Rank  string `json:"rank"`  // 2, 3, ..., 10, J, Q, K, A
-	Value int    `json:"value"` // Default face value
+	Suit  string `json:"suit"`  // H, D, C, S
+	Rank  string `json:"rank"`  // 2-10, J, Q, K, A
+	Value int    `json:"value"` // base face value
 }
 
 type Game struct {
 	ID          uint      `gorm:"primaryKey" json:"id"`
 	UserID      uint      `gorm:"not null;index" json:"user_id"`
 	BetAmount   int       `gorm:"not null" json:"bet_amount"`
-	PlayerCards string    `gorm:"type:text;not null" json:"player_cards"` // JSON string
-	DealerCards string    `gorm:"type:text;not null" json:"dealer_cards"` // JSON string
+	PlayerCards string    `gorm:"type:text;not null" json:"player_cards"` // serialized cards
+	DealerCards string    `gorm:"type:text;not null" json:"dealer_cards"` // serialized cards
 	PlayerScore int       `gorm:"not null" json:"player_score"`
 	DealerScore int       `gorm:"not null" json:"dealer_score"`
 	Status      string    `gorm:"size:20;not null" json:"status"` // IN_PROGRESS, PLAYER_WON, DEALER_WON, DRAW

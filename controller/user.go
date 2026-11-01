@@ -75,7 +75,7 @@ func GetProfile(c *gin.Context) {
 
 	user := currentUser.(models.User)
 
-	// Fetch freshest balance from DB
+	// grab fresh balance from db
 	if err := config.DB.First(&user, user.ID).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch user"})
 		return

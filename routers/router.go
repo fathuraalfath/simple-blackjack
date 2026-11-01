@@ -39,18 +39,18 @@ func BasicAuthMiddleware() gin.HandlerFunc {
 func SetupRouter() *gin.Engine {
 	r := gin.Default()
 
-	// Public endpoints
+	// public routes
 	r.POST("/users/register", controller.Register)
 
-	// Authenticated endpoints
+	// auth-protected routes
 	auth := r.Group("/")
 	auth.Use(BasicAuthMiddleware())
 	{
-		// User profile & coins
+		// user & coins
 		auth.GET("/users/me", controller.GetProfile)
 		auth.POST("/users/coin", controller.AddCoin)
 
-		// Game session & CRUD
+		// blackjack game endpoints
 		auth.POST("/games", controller.StartGame)
 		auth.GET("/games", controller.ListGames)
 		auth.GET("/games/:id", controller.GetGame)

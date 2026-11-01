@@ -40,6 +40,9 @@ func LoadEnv() {
 }
 
 func ConnectDatabase() *gorm.DB {
+	if DB != nil {
+		return DB
+	}
 	LoadEnv()
 
 	dsn := os.Getenv("DATABASE_URL")
@@ -53,7 +56,7 @@ func ConnectDatabase() *gorm.DB {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 
-	// Auto-create/migrate tables
+	// let gorm auto-sync tables
 	if err := db.AutoMigrate(&models.User{}, &models.Game{}); err != nil {
 		log.Fatalf("Failed to migrate database schema: %v", err)
 	}

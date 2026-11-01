@@ -83,7 +83,7 @@ func StartGame(c *gin.Context) {
 		return
 	}
 
-	// Deduct coin immediately upon starting game
+	// take bet upfront
 	currentUser.Coin -= input.Bet
 	if err := config.DB.Save(&currentUser).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to deduct coin"})
@@ -104,14 +104,14 @@ func StartGame(c *gin.Context) {
 
 	status := "IN_PROGRESS"
 
-	// Natural blackjack check
+	// check if player got lucky right away
 	if playerScore == 21 {
 		if dealerScore == 21 {
 			status = "DRAW"
 			currentUser.Coin += input.Bet
 		} else {
 			status = "PLAYER_WON"
-			// Blackjack payout 2.5x (original bet + 1.5x profit)
+			// 3:2 blackjack payout
 			payout := int(float64(input.Bet) * 2.5)
 			currentUser.Coin += payout
 		}
@@ -172,7 +172,7 @@ func Hit(c *gin.Context) {
 
 	game.PlayerScore = playerScore
 	if playerScore > 21 {
-		game.Status = "DEALER_WON" // Player bust
+		game.Status = "DEALER_WON" // player busted
 	}
 
 	pBytes, _ := json.Marshal(playerCards)
@@ -213,7 +213,7 @@ func Stand(c *gin.Context) {
 	used = append(used, playerCards...)
 	used = append(used, dealerCards...)
 
-	// Dealer draws until score >= 17
+	// dealer hits until hitting 17+
 	dealerScore := models.CalculateHandScore(dealerCards)
 	for dealerScore < 17 {
 		card := drawFromRemaining(used)
@@ -226,21 +226,21 @@ func Stand(c *gin.Context) {
 	dBytes, _ := json.Marshal(dealerCards)
 	game.DealerCards = string(dBytes)
 
-	// Determine winner
+	// see who won
 	if dealerScore > 21 {
-		// Dealer bust -> player wins 2x
+		// dealer went over 21
 		game.Status = "PLAYER_WON"
 	} else if game.PlayerScore > dealerScore {
-		// Player higher score -> player wins 2x
+		// player has higher hand
 		game.Status = "PLAYER_WON"
 	} else if game.PlayerScore == dealerScore {
-		// Push / draw -> bet refunded
+		// push, return bet
 		game.Status = "DRAW"
 	} else {
 		game.Status = "DEALER_WON"
 	}
 
-	// Update payout if player won or draw
+	// settle winnings
 	if game.Status == "PLAYER_WON" || game.Status == "DRAW" {
 		_ = config.DB.First(&currentUser, currentUser.ID)
 		if game.Status == "PLAYER_WON" {
