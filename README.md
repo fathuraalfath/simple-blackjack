@@ -30,8 +30,6 @@ Aplikasi ini mencakup manajemen user dengan saldo koin serta siklus hidup permai
 
 ```text
 simple-blackjack/
-|-- api/
-|   `-- index.go          # Handler serverless untuk deployment Vercel
 |-- config/
 |   `-- database.go       # Koneksi PostgreSQL & eksekusi GORM AutoMigrate
 |-- controller/
@@ -45,8 +43,7 @@ simple-blackjack/
 |-- game_logic_test.go    # Unit test evaluasi skor kartu dan kartu As
 |-- go.mod                # Daftar dependensi Go
 |-- go.sum
-|-- main.go               # Titik masuk aplikasi (lokal)
-|-- vercel.json           # Konfigurasi routing Vercel
+|-- main.go               # Titik masuk aplikasi
 `-- README.md             # Dokumentasi API
 ```
 
@@ -92,7 +89,7 @@ simple-blackjack/
 2. Buka dashboard Vercel, pilih **Add New Project**, lalu import repositori ini.
 3. Pada menu **Environment Variables**, tambahkan:
    - `DATABASE_URL`: URI connection string dari Supabase (pilih mode **Transaction pooler** port 6543 dengan format `postgresql://postgres.[PROJECT_REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres?sslmode=require`).
-4. Klik **Deploy**. Vercel akan otomatis mendeteksi konfigurasi `vercel.json` dan menjalankan handler di `api/index.go`.
+4. Klik **Deploy**. Vercel akan otomatis mendeteksi server Go `main.go` dan menjalankannya secara native.
 
 ---
 
