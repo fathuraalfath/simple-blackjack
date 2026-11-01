@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 	"net/url"
+	"strings"
 	"sync"
 
 	"simple-blackjack/config"
@@ -21,17 +22,17 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		app = routers.SetupRouter()
 	})
 
-	// vercel rewrites replace r.URL.Path with "/api/index.go", restore real path
-	if matchedPath := r.Header.Get("x-matched-path"); matchedPath != "" {
+	// restore original path forwarded by vercel rewrite
+	if p := r.URL.Query().Get("__path"); p != "" {
+		if !strings.HasPrefix(p, "/") {
+			p = "/" + p
+		}
+		r.URL.Path = p
+	} else if matchedPath := r.Header.Get("x-matched-path"); matchedPath != "" {
 		if u, err := url.Parse(matchedPath); err == nil {
 			r.URL.Path = u.Path
-			r.RequestURI = matchedPath
-			if u.RawQuery != "" {
-				r.URL.RawQuery = u.RawQuery
-			}
 		} else {
 			r.URL.Path = matchedPath
-			r.RequestURI = matchedPath
 		}
 	}
 
